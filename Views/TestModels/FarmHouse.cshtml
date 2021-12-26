@@ -1,0 +1,53 @@
+﻿
+@model IEnumerable<DehradunSS.Models.FarmHouse>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AdvanceSearch</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossOrigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossOrigin="anonymous"></script>
+</head>
+<body>
+    <div>
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.gid)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.name)
+                </th>
+
+
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.gid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.name)
+            </td>
+            <td>
+                
+                <a class="btn btn-success" asp-action="FarmHouseDetails" asp-route-id="@item.gid">Details</a> 
+                
+            </td>
+        </tr>
+            }
+        </table>
+    </div>
+    @*<span>@Html.ActionLink("Back", "AdvanceSearch", "Home")</span>*@
+    <a href="@Url.Action("AdvanceSearch","Home")"><button class="btn btn-warning">Back</button></a>
+</body>
+</html>

@@ -1,0 +1,285 @@
+﻿
+@model IEnumerable<DehradunSS.Models.AdvanceSearch>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AdvanceSearch</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossOrigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossOrigin="anonymous"></script>
+</head>
+<body>
+    <div>
+        <form action="/TestModels/AdvanceSearch" method="Post" id="AdForm">
+            <label for="advanceLayer">Layer: </label>
+            <!--<select name="Layer" id="Layer" onchange="Check()">-->
+            @* <option value="">--Select Value--</option>*@
+            <!--<option value="busdepot">Bus Depot</option>-->
+            @*<option value="bankforlandmark">Banks</option>
+        <option value="parking">Parking</option>
+        <option value="medicalstore">MedicalStore</option>*@
+            <!--</select>-->
+
+            @Html.DropDownList("SelectTableVal",
+                    new SelectList(Enum.GetValues(typeof(AdvanceSearchTable))),
+                    "Select Table",
+                    new { @class = "form-control", @onChange = "SelectedValue(this)" })
+            <br> <br>
+            <label for="advanceField">Field : </label>
+            <select name="Field" id="Field" onchange="ValueOf()">
+                <option value="">--Select Value--</option>
+            </select><br> <br>
+
+            <label for="advanceValue">Value : </label>
+            <select id="ValuesFrom" name="ValuesFrom" onchange="ValueFrom()">
+                <option value="">--Select Value--</option>
+            </select> <br>
+
+            <table align="center">
+                <tr>
+                    <td> <input type="button" class="btn btn-dark" value="=" id="equal" onclick="Cal1()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="&lt;&gt;" id="notequal" onclick="Cal2()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="Like" id="like" onclick="Cal3()"></td>
+                </tr>
+                <tr>
+                    <td> <input type="button" class="btn btn-dark" value="&gt;" id="gt" onclick="Cal4()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="&gt;&equals;" id="gtequal" onclick="Cal5()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="%" id="perc" onclick="Cal6()"></td>
+                </tr>
+                <tr>
+                    <td> <input type="button" class="btn btn-dark" value="&lt;" id="lt" onclick="Cal7()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="&lt;&equals;" id="ltequal" onclick="Cal8()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="Not" id="not" onclick="Cal9()"></td>
+                </tr>
+                <tr>
+                    <td> <input type="button" class="btn btn-dark" value="And" id="And" onclick="Cal10()"></td>
+                    <td> <input type="button" class="btn btn-dark" value="Or" id="Or" onclick="Cal11()"></td>
+                </tr>
+            </table>
+
+            <input type='text' id="query" name="query"> <br>
+
+
+            <input type="submit" value="OK GO" class="btn bg-success" id="AdSearchbtn">
+            @*<input type="button" class="btn bg-warning" value="Show Result" id="ShowResult">*@
+            <input type="button" class="btn bg-danger" value="Close" onclick="closeIframe()" id="closeAdvance">
+            <div id="AdvanceSearchShow">
+                <table id="AdvanceSearchShowTable" border="1" rules="all" width=100%></table>
+            </div>
+        </form>
+
+    </div>
+    
+    <script>
+        var Data, selectedValue, selectedText;
+        function SelectedValue(ddlObject) {
+            
+             selectedValue = ddlObject.value;
+             selectedText = ddlObject.options[ddlObject.selectedIndex].innerHTML;
+            var Form = document.getElementById("AdForm");
+            //Form.method = "POST";
+            Form.action = "/TestModels/" + selectedValue;
+            
+            localStorage.clear();
+
+            
+            document.getElementById("Field").innerHTML = "";
+            if (selectedText == 'BusDepot') {
+                localStorage.setItem("LayerName", "BusDepotLayer");
+                document.getElementById("Field").innerHTML += "<option value='*'>*</option><option value='gid'>ID</option><option value='name'>name</option>";
+            } else if (selectedText == 'FarmHouse') {
+                localStorage.setItem("LayerName", "FarmHouseLayer");
+                document.getElementById("Field").innerHTML += " <option value='*'>*</option> <option value='gid'>ID</option><option value='name'>name</option>";
+            } else if (selectedText == 'Parking') {
+                localStorage.setItem("LayerName", "ParkingLayer");
+                document.getElementById("Field").innerHTML += "  <option value='*'>*</option><option value='gid'>ID</option><option value='name'>name</option>";
+            } else if (selectedText == 'MedicalStore') {
+                localStorage.setItem("LayerName", "MedicalStoreLayer");
+                document.getElementById("Field").innerHTML += " <option value='*'>*</option> <option value='gid'>ID</option><option value='sgovtbuild'>name</option><option value='location'>Location</option><option value='area'>Area</option><option value='city'>city</option>";
+            } else if (selectedText == 'PostOffice') {
+                localStorage.setItem("LayerName", "PostOffLayer");
+                document.getElementById("Field").innerHTML += "  <option value='*'>*</option><option value='gid'>ID</option><option value='name'>name</option>";
+            } else if (selectedText == 'Hospital') {
+                localStorage.setItem("LayerName", "HospitalLayer");
+                document.getElementById("Field").innerHTML += " <option value='*'>*</option> <option value='gid'>ID</option><option value='sgovtbuild'>name</option><option value='location'>Location</option><option value='area'>Area</option><option value='city'>city</option>";
+            }
+        }
+        function ValueOf() {
+            if (selectedText == 'BusDepot') {
+                var p = new Promise((resolve, reject) => {
+                    fetch('http://localhost:8081/geoserver/DehradunGIS/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=DehradunGIS%3Abusdepot&maxFeatures=50&outputFormat=application%2Fjson')
+                        .then(function (res) {
+                            res.text().then(function (data) {
+                                Data = JSON.parse(data);
+                                //Data = Data.features;
+                                console.log(Data);
+                                ChangeVal();
+                            })
+                        });
+                });
+            } else if (selectedText == 'FarmHouse') {
+                var p = new Promise((resolve, reject) => {
+                    fetch('http://localhost:8081/geoserver/DehradunGIS/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=DehradunGIS%3Afarmhouse&maxFeatures=50&outputFormat=application%2Fjson')
+                        .then(function (res) {
+                            res.text().then(function (data) {
+                                Data = JSON.parse(data);
+                                //Data = Data.features;
+                                console.log(Data);
+                                ChangeVal();
+                            })
+                        });
+                });
+            } else if (selectedText == 'Parking') {
+                var p = new Promise((resolve, reject) => {
+                    fetch('http://localhost:8081/geoserver/DehradunGIS/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=DehradunGIS%3Aparking&maxFeatures=50&outputFormat=application%2Fjson')
+                        .then(function (res) {
+                            res.text().then(function (data) {
+                                Data = JSON.parse(data);
+                                //Data = Data.features;
+                                console.log(Data);
+                                ChangeVal();
+                            })
+                        });
+                });
+            } else if (selectedText == 'MedicalStore') {
+                var p = new Promise((resolve, reject) => {
+                    fetch('http://localhost:8081/geoserver/DehradunGIS/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=DehradunGIS%3Amedicalstore&maxFeatures=50&outputFormat=application%2Fjson')
+                        .then(function (res) {
+                            res.text().then(function (data) {
+                                Data = JSON.parse(data);
+                                //Data = Data.features;
+                                console.log(Data);
+                                ChangeVal();
+                            })
+                        });
+                });
+            } else if (selectedText == 'PostOffice') {
+                var p = new Promise((resolve, reject) => {
+                    fetch('http://localhost:8081/geoserver/DehradunGIS/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=DehradunGIS%3Apostoffice&maxFeatures=50&outputFormat=application%2Fjson')
+                        .then(function (res) {
+                            res.text().then(function (data) {
+                                Data = JSON.parse(data);
+                                //Data = Data.features;
+                                console.log(Data);
+                                ChangeVal();
+                            })
+                        });
+                });
+            }
+            else if (selectedText == 'Hospital') {
+                var p = new Promise((resolve, reject) => {
+                    fetch('http://localhost:8081/geoserver/DehradunGIS/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=DehradunGIS%3Ahospitals&maxFeatures=50&outputFormat=application%2Fjson')
+                        .then(function (res) {
+                            res.text().then(function (data) {
+                                Data = JSON.parse(data);
+                                //Data = Data.features;
+                                console.log(Data);
+                                ChangeVal();
+                            })
+                        });
+                });
+            }
+        }
+        function ChangeVal() {
+            Field=document.getElementById("Field").value;
+            document.getElementById("ValuesFrom").innerHTML = "";
+            console.log(Field);
+            // if (Field = "gid") {
+            //     for (var i = 0; i < Data.features.length; i++) {
+            //         document.getElementById("ValuesFrom").innerHTML += "<option value='" + Data.features[i].properties.gid + "''>" + Data.features[i].properties.gid + " </option>";
+            //     }
+            // }
+            if (Field == "name") {
+                for (var i = 0; i < Data.features.length; i++) {
+                    
+                    document.getElementById("ValuesFrom").innerHTML += "<option value='" + Data.features[i].properties.name + "''>" + Data.features[i].properties.name + " </option>";
+                }
+            }
+            if (Field == "sgovtbuild") {
+                for (var i = 0; i < Data.features.length; i++) {
+                    
+                    document.getElementById("ValuesFrom").innerHTML += "<option value='" + Data.features[i].properties.sgovtbuild + "''>" + Data.features[i].properties.sgovtbuild + " </option>";
+                }
+            }
+            if (Field == "location") {
+                for (var i = 0; i < Data.features.length; i++) {
+                    
+                    document.getElementById("ValuesFrom").innerHTML += "<option value='" + Data.features[i].properties.location + "''>" + Data.features[i].properties.location + " </option>";
+                }
+            }
+            if (Field == "area") {
+                for (var i = 0; i < Data.features.length; i++) {
+                    document.getElementById("query").innerHTML = "area";
+                    document.getElementById("ValuesFrom").innerHTML += "<option value='" + Data.features[i].properties.area + "''>" + Data.features[i].properties.area + " </option>";
+                }
+            }
+            if (Field == "city") {
+                for (var i = 0; i < Data.features.length; i++) {
+                    
+                    document.getElementById("ValuesFrom").innerHTML += "<option value='" + Data.features[i].properties.city + "''>" + Data.features[i].properties.city + " </option>";
+                }
+            }
+        }
+        function ValueFrom() {
+            console.log(document.getElementById("ValuesFrom").value);
+            document.getElementById("query").value = Field + "=" + document.getElementById("ValuesFrom").value;
+
+        }
+        function Cal1() {
+            document.getElementById("query").value += document.getElementById("equal").value;
+        }
+
+        function Cal2() {
+            document.getElementById("query").value += document.getElementById("notequal").value;
+        }
+
+        function Cal3() {
+            document.getElementById("query").value += document.getElementById("like").value;
+        }
+
+        function Cal4() {
+            document.getElementById("query").value += document.getElementById("gt").value;
+        }
+
+        function Cal5() {
+            document.getElementById("query").value += document.getElementById("gtequal").value;
+        }
+
+        function Cal6() {
+            document.getElementById("query").value += document.getElementById("perc").value;
+        }
+
+        function Cal7() {
+            document.getElementById("query").value += document.getElementById("lt").value;
+        }
+
+        function Cal8() {
+            document.getElementById("query").value += document.getElementById("ltequal").value;
+        }
+
+        function Cal9() {
+            document.getElementById("query").value += document.getElementById("not").value;
+        }
+
+        function Cal10() {
+            document.getElementById("query").value += document.getElementById("And").value;
+        }
+
+        function Cal11() {
+            document.getElementById("query").value += document.getElementById("Or").value;
+        }
+        function closeIframe() {
+            var iframe = document.getElementById('IframeA');
+            iframe.parentNode.removeChild(iframe);
+
+            window.close();
+        }
+    </script>
+</body>
+</html>

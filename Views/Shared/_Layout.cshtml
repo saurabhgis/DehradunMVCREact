@@ -1,0 +1,103 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DehradunSS</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/1.css" />
+</head>
+<body>
+    
+    <!--<header>
+         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+             <div class="container">
+                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DehradunSS</a>
+                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                         aria-expanded="false" aria-label="Toggle navigation">
+                     <span class="navbar-toggler-icon"></span>
+                 </button>
+                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                     <ul class="navbar-nav flex-grow-1">
+                         <li class="nav-item">
+                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                         </li>
+                     </ul>
+                 </div>
+             </div>
+         </nav>
+     </header>-->
+    <div class=" navbar-fixed-top" style="border-radius:0px">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="border-radius:0px">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="justify-content-end collapse navbar-collapse" id="navbarNavAltMarkup" style="border-radius:0px">
+                <div class="navbar-nav">
+
+                    <div id="NavForHome" class="navbar-nav">
+
+                        @*<a class="nav-item nav-link " style="font-size:15px" href="@Url.Action("Index", "Home")"><i style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Home</i>  </a>
+            <a class="nav-item nav-link " style="font-size:15px" href="@Url.Action("SignIn", "Home")"> <i>SignIn</i> </a>
+            <a class="nav-item nav-link" style="font-size:15px" href="@Url.Action("About", "Home")"> <i>About</i> </a>*@
+                        <a class="nav-item nav-link btn btn-success " style="font-size:15px;color:#f2f2f2" href="@Url.Action("DehradunSS", "Home")">City GIS</a>
+
+                    </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span class="nav-item nav-link disabled" style="font-size:15px;color:#f2f2f2"> @User.Identity.Name</span>
+                        <form action="/Home/LogOut" method="post">
+                            <input type="submit" value="Logout" class="btn btn-dark" />
+                        </form>
+
+                        <script>
+                            document.getElementById("NavForHome").style.display = "none";
+                            //document.getElementById("AdvanceSearch").style.display = "none";
+                            //document.getElementById("PredefineQuery").style.display = "none";
+                        </script>
+                    }
+                    else
+                    {
+                        <script>
+                            document.getElementById("NavForHome").style.display = "";
+                        </script>
+                    }
+                    @*@if (User.IsInRole("Admin"))
+                    {
+                        <script>
+                           
+                        </script>
+                    }*@
+
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div id="NavBarId"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.7.1/remarkable.min.js"></script>
+    @*<script src="@Url.Content("~/js/Navbar.jsx")"></script>*@
+    <div>
+        <main role="main" >
+            @RenderBody()
+        </main>
+    </div>
+
+    @*<footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - DehradunSS - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>*@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
